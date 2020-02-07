@@ -1,0 +1,3 @@
+com\webvidhi\aws\dynamodb\ScanSample.class
+com\webvidhi\aws\dynamodb\QuerySample.class
+com\webvidhi\aws\dynamodb\AmazonDynamoDBSample.class
