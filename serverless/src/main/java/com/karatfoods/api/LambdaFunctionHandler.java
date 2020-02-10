@@ -7,6 +7,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karatfoods.api.model.Product;
 
 public class LambdaFunctionHandler implements RequestHandler<Object, String> {
@@ -15,10 +16,10 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 
 	@Override
 	public String handleRequest(Object object, Context context) {
-
+		ObjectMapper objectMapper = new ObjectMapper();
+		Product product = objectMapper.convertValue(object,Product.class);
 		try {
 			init();
-			Product product = (Product) object;
 			context.getLogger().log("ID: " + product.getProductId());
 			DynamoDBMapper mapper = new DynamoDBMapper(dynamoDB);
 			mapper.save(product);
@@ -35,7 +36,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 		 * The ProfileCredentialsProvider will return your [default] credential profile
 		 * by reading from the credentials file located at
 		 * (C:\\Users\\statiraju\\.aws\\credentials).
-		 */
+		 
 		ProfileCredentialsProvider credentialsProvider = new ProfileCredentialsProvider();
 		try {
 			credentialsProvider.getCredentials();
@@ -44,6 +45,7 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 					+ "Please make sure that your credentials file is at the correct "
 					+ "location (C:\\Users\\statiraju\\.aws\\credentials), and is in valid format.", e);
 		}
+		*/
 		dynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion("us-east-1")
 				.build();
 	}
