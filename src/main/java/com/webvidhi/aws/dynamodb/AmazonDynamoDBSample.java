@@ -100,7 +100,8 @@ public class AmazonDynamoDBSample {
 
         //createTable();
         //ScanSample.scanTable();
-        QuerySample.query();
+        //QuerySample.query();
+        CreateSample.create();
         
        
     }
