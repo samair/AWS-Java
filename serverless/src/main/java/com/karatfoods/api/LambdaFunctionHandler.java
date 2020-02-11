@@ -10,11 +10,12 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.karatfoods.api.model.Product;
 
-public class LambdaFunctionHandler implements RequestHandler<Object, String> {
+public class LambdaFunctionHandler{
+//implements RequestHandler<Object, String> {
 
 	private static AmazonDynamoDB dynamoDB;
 
-	@Override
+	//@Override
 	public String handleRequest(Object object, Context context) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		Product product = objectMapper.convertValue(object,Product.class);
