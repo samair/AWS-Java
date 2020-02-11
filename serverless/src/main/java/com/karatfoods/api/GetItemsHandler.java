@@ -42,7 +42,7 @@ public class GetItemsHandler implements RequestStreamHandler {
 	    Response response = new Response();
 	    response.setBase64Encoded(true);
 	    response.setStatusCode(200);
-	    response.setBody("test");
+	    response.setBody("Record Created");
 	    Map <String,String > headers = new HashMap<>();
 	    headers.put("test", "test");
 	    response.setHeaders(headers);
