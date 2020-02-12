@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -24,6 +25,7 @@ public class LambdaFunctionHandlerTest {
 
     private static Object input;
     private static InputStream anyInputStream;
+    private static InputStream getInputStream;
 
     @BeforeClass
     public static void createInput() throws IOException {
@@ -33,7 +35,23 @@ public class LambdaFunctionHandlerTest {
         product.setCatId(1);
         input = product;
         String responseString = new Gson().toJson(product);
-        anyInputStream = new ByteArrayInputStream(responseString.getBytes());
+        //anyInputStream = new ByteArrayInputStream(responseString.getBytes());
+        
+        Gson gson = new Gson();
+    	
+    	// 1. JSON file to Java object
+    	Map object = gson.fromJson(new FileReader("/Users/samair/git/AWS-Java/serverless/src/test/java/com/karatfoods/api/payload_post_data.json"), Map.class);
+        String respString = new Gson().toJson(object);
+        System.out.println("Request :"+respString);
+        anyInputStream = new ByteArrayInputStream(respString.getBytes());
+        
+        //Set up GET response
+        
+     	object = gson.fromJson(new FileReader("/Users/samair/git/AWS-Java/serverless/src/test/java/com/karatfoods/api/payload_get_data.json"), Map.class);
+        respString = new Gson().toJson(object);
+        System.out.println("Request Get :"+respString);
+        getInputStream = new ByteArrayInputStream(respString.getBytes());
+        
     }
 
     private Context createContext() {
@@ -45,7 +63,7 @@ public class LambdaFunctionHandlerTest {
         return ctx;
     }
 
-    @Test
+  //  @Test
     public void testLambdaFunctionHandler() {
         LambdaFunctionHandler handler = new LambdaFunctionHandler();
         Context ctx = createContext();
@@ -54,7 +72,7 @@ public class LambdaFunctionHandlerTest {
 
         Assert.assertEquals("OK", output);
     }
-   @Test
+  // @Test
     public void testLambdaDescription() {
     	 Product p = (Product)input;
     	 p.setDescription("Green Peas, fresh from farm.");
@@ -69,11 +87,11 @@ public class LambdaFunctionHandlerTest {
     @Test
     public void testStreamHandler() {
     	
-    	ByteArrayOutputStream out = new ByteArrayOutputStream();
+    	ByteArrayOutputStream out1 = new ByteArrayOutputStream();
     	GetItemsHandler handler = new GetItemsHandler();
     	Context ctx = createContext();
     	try {
-			handler.handleRequest(anyInputStream, out, ctx);
+			handler.handleRequest(anyInputStream, out1, ctx);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,11 +99,33 @@ public class LambdaFunctionHandlerTest {
     	 Response response = new Response();
  	    response.setBase64Encoded(true);
  	    response.setStatusCode(200);
- 	    response.setBody("Record Created");
+ 	    response.setBody("GET");
  	    Map <String,String > headers = new HashMap<>();
  	    headers.put("test", "test");
  	    response.setHeaders(headers);
     	
-    	Assert.assertEquals(new Gson().toJson(response),out.toString());
+    	Assert.assertEquals(new Gson().toJson(response).toString(),out1.toString());
+    }
+    @Test
+    public void testStreamHandler_Get() {
+    	
+    	ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+    	GetItemsHandler handler = new GetItemsHandler();
+    	Context ctx = createContext();
+    	try {
+			handler.handleRequest(getInputStream, out2, ctx);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	 Response response = new Response();
+ 	    response.setBase64Encoded(true);
+ 	    response.setStatusCode(200);
+ 	    response.setBody("POST");
+ 	    Map <String,String > headers = new HashMap<>();
+ 	    headers.put("test", "test");
+ 	    response.setHeaders(headers);
+    	
+    	Assert.assertEquals(new Gson().toJson(response).toString(),out2.toString());
     }
 }

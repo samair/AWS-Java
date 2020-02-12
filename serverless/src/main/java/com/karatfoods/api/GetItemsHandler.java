@@ -18,39 +18,50 @@ import com.karatfoods.api.model.Response;
 
 public class GetItemsHandler implements RequestStreamHandler {
 
-	//private static AmazonDynamoDB dynamoDB;
+	// private static AmazonDynamoDB dynamoDB;
 
 	public static void init() throws Exception {
 
-		//dynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion("us-east-1")
-		//		.build();
+		// dynamoDB = AmazonDynamoDBClientBuilder.standard().withRegion("us-east-1")
+		// .build();
 	}
 
 	@Override
 	public void handleRequest(InputStream input, OutputStream output, Context context) throws IOException {
-		JsonParser parser = new JsonParser();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+	
+
+		JsonObject event = (JsonObject) JsonParser.parseReader(reader);
+
+		context.getLogger().log("Got :" + event.toString() + " : " + context.getFunctionName());
+		context.getLogger().log(event.get("httpMethod").getAsString());
+
+		String httpMethod = event.get("httpMethod").getAsString();
+		
+		switch (httpMethod) {
+		case "GET":
+			System.out.println("Got a GET http request");
+			break;
+		case "POST":
+			System.out.println("Got a POST http request");
+			break;	
+		}
+		Response response = new Response();
+		response.setBase64Encoded(true);
+		response.setStatusCode(200);
+		response.setBody(httpMethod);
+		Map<String, String> headers = new HashMap<>();
+		headers.put("test", "test");
+		response.setHeaders(headers);
+		OutputStreamWriter outWriter = new OutputStreamWriter(output, "UTF-8");
+
+		String responseString = new Gson().toJson(response);
+		context.getLogger().log("Response : " + responseString);
+		outWriter.write(responseString);
+		outWriter.flush();
+		outWriter.close();
 		
 
-		    BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-		    JsonObject responseJson = new JsonObject();
-	    
-		    JsonObject event = (JsonObject) parser.parse(reader);
-		    
-	    context.getLogger().log("Got :"+event.toString() + " : "+context.getFunctionName());  
-
-	    
-	    Response response = new Response();
-	    response.setBase64Encoded(true);
-	    response.setStatusCode(200);
-	    response.setBody("Record Created");
-	    Map <String,String > headers = new HashMap<>();
-	    headers.put("test", "test");
-	    response.setHeaders(headers);
-	    OutputStreamWriter  outWriter = new OutputStreamWriter (output,"UTF-8");
-	    
-	    String responseString = new Gson().toJson(response);
-	    context.getLogger().log("Response : "+responseString);
-	    outWriter.write(responseString);
-	    outWriter.close();
-	 }
+	}
 }
